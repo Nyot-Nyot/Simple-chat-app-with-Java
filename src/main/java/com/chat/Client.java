@@ -25,7 +25,9 @@ public class Client {
                 try {
                     String message;
                     while (!"!exit".equals(message = serverReader.readLine())) {
-                        System.out.println(message);
+                        if (!message.startsWith(socket.getInetAddress().toString())) {
+                            System.out.println(message);
+                        }
                     }
                 } catch (IOException e) {
                     System.err.println(e);

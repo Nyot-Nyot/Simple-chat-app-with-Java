@@ -26,7 +26,7 @@ public class Server {
                 new Thread(() -> {
                     try (BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
                         String message;
-                        while (!"!exit".equals(message = in.readLine())) { 
+                        while ((message = in.readLine()) != null && !"!exit".equals(message)) {
                             synchronized (clients) {
                                 for (Socket client : clients) {
                                     if (!client.isClosed()) {
