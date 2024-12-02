@@ -10,8 +10,17 @@ public class Client {
     public static void main(String[] args) {
         try (BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in))) {
 
-            String serverIP = prompt(userInput, "Masukkan server ip: ");
+            String serverIP = prompt(userInput, "Masukkan server IP: ");
+            while (!isValidIP(serverIP)) {
+                System.out.println("Invalid IP address. Please try again.");
+                serverIP = prompt(userInput, "Masukkan server IP: ");
+            }
+
             String username = prompt(userInput, "Masukkan username: ");
+            while (username == null || username.trim().isEmpty()) {
+                System.out.println("Username cannot be empty. Please try again.");
+                username = prompt(userInput, "Masukkan username: ");
+            }
 
             try (Socket socket = new Socket(serverIP, 5000);
                  PrintWriter serverWriter = new PrintWriter(socket.getOutputStream(), true)) {
@@ -19,7 +28,10 @@ public class Client {
                 Thread listenerThread = new Thread(new ServerListener(socket));
                 listenerThread.start();
 
-                sendMessageLoop(userInput, serverWriter, username);
+                // Send username to the server
+                serverWriter.println(username);
+
+                sendMessageLoop(userInput, serverWriter);
 
                 serverWriter.println("!exit");
                 listenerThread.join();
@@ -41,11 +53,16 @@ public class Client {
         return reader.readLine();
     }
 
-    private static void sendMessageLoop(BufferedReader userInput, PrintWriter serverWriter, String username) throws IOException {
+    private static void sendMessageLoop(BufferedReader userInput, PrintWriter serverWriter) throws IOException {
         String message;
         while (!"!exit".equals(message = userInput.readLine())) {
-            serverWriter.println(username + ": " + message);
+            serverWriter.println(message);
         }
+    }
+
+    private static boolean isValidIP(String ip) {
+        // Simple IP address validation
+        return ip.matches("\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b");
     }
 
     private static class ServerListener implements Runnable {
