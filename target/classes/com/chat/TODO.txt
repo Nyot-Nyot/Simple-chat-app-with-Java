@@ -1,4 +1,4 @@
-1. Penanganan exception yg lebih baik
+# 1. Penanganan exception yg lebih baik
 2. Pengaturan resource yg tepat
 3. Buat code jadi lebih clean dengan membuat method atau class terpisah
 4. Buat validasi input
