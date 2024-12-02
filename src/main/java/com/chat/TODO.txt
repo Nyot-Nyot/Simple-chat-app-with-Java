@@ -1,6 +1,6 @@
 # 1. Penanganan exception yg lebih baik
 # 2. Pengaturan resource yg tepat
-3. Buat code jadi lebih clean dengan membuat method atau class terpisah
+# 3. Buat code jadi lebih clean dengan membuat method atau class terpisah
 4. Buat validasi input
 5. Notifikasi status client di server maupun client
 6. Improve UI?

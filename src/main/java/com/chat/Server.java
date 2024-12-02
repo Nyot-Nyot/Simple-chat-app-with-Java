@@ -49,15 +49,22 @@ public class Server {
 
     private static class ClientHandler implements Runnable {
         private final Socket socket;
+        private PrintWriter out; // Add this field
 
         public ClientHandler(Socket socket) {
             this.socket = socket;
+            try {
+                this.out = new PrintWriter(socket.getOutputStream(), true); // Initialize the PrintWriter
+            } catch (IOException e) {
+                System.err.println("Error initializing output stream: " + e.getMessage());
+            }
         }
 
         @Override
         public void run() {
-            try (BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(socket.getInputStream()))) {
+            try {
+                BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(socket.getInputStream())); // Remove try-with-resources
                 String message;
                 while ((message = reader.readLine()) != null && !"!exit".equals(message)) {
                     broadcastMessage(message, this);
@@ -70,11 +77,7 @@ public class Server {
         }
 
         public void sendMessage(String message) {
-            try (PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
-                out.println(message);
-            } catch (IOException e) {
-                System.err.println("Error sending message to client: " + e.getMessage());
-            }
+            out.println(message); // Use the existing PrintWriter
         }
 
         private void cleanup() {
