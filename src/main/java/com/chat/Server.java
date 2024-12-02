@@ -98,7 +98,6 @@ public class Server {
             broadcastMessage("Server: " + username + " has left the chat.", this);
             try {
                 socket.close();
-                System.out.println(socket.getInetAddress() + " is disconnected");
             } catch (IOException e) {
                 System.err.println("Error closing client socket: " + e.getMessage());
             }
