@@ -1,6 +1,8 @@
 package com.chat;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -11,9 +13,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Server {
     private static final Set<ClientHandler> clients = ConcurrentHashMap.newKeySet();
+    private static PrintWriter logWriter;
 
     public static void main(String[] args) {
-        try (ServerSocket serverSocket = new ServerSocket(5000)) {
+        try (ServerSocket serverSocket = new ServerSocket(5000);
+             PrintWriter logWriterTemp = new PrintWriter(new BufferedWriter(new FileWriter("chat_log.txt", true)), true)) {
+
+            logWriter = logWriterTemp;
             System.out.println("Server is running");
 
             while (true) {
@@ -21,7 +27,7 @@ public class Server {
             }
 
         } catch (IOException e) {
-            System.err.println("Error starting server on port 5000: " + e.getMessage());
+            System.err.println("Error starting server or initializing log writer: " + e.getMessage());
         }
     }
 
@@ -45,6 +51,8 @@ public class Server {
                 client.sendMessage(message);
             }
         }
+        // Write the message to the log file
+        logWriter.println(message);
     }
 
     private static class ClientHandler implements Runnable {
@@ -64,8 +72,7 @@ public class Server {
         @Override
         public void run() {
             try {
-                BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(socket.getInputStream())); // Remove try-with-resources
+                BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 // Read the username from the client
                 username = reader.readLine();
                 if (username == null || username.trim().isEmpty()) {
@@ -104,3 +111,4 @@ public class Server {
         }
     }
 }
+
